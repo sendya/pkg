@@ -7,6 +7,13 @@ type Resp interface {
 	WithMessage(id string) Resp                                           // WithMessage 设置当前请求的错误信息
 }
 
+type RespPage interface {
+	GetData() interface{}
+	GetTotal() int64
+	GetPageSize() int
+	GetCurrent() int
+}
+
 type resp struct {
 	Code    int         `json:"code"`              // 业务编码
 	Message string      `json:"message,omitempty"` // 错误描述

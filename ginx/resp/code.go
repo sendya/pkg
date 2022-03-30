@@ -27,6 +27,13 @@ func JSON(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusOK, NewResp(int(ok), "OK").WithData(v))
 }
 
+// 服务正常 并返回分页数据，分页对象需要实现 resp.RespPage interface{}
+func WithPage(ctx *gin.Context, v RespPage) {
+	ctx.JSON(http.StatusOK, NewResp(int(ok), "").
+		WithPage(v.GetData(), v.GetPageSize(), v.GetCurrent(), int(v.GetTotal())),
+	)
+}
+
 // 服务正常 并返回分页数据结构
 func JSONPage(ctx *gin.Context, v interface{}, pageSize, current int, total int64) {
 	ctx.JSON(http.StatusOK, NewResp(int(ok), "OK").WithPage(v, pageSize, current, int(total)))
