@@ -173,6 +173,14 @@ func New(writer io.Writer, level Level, opts ...Option) *Logger {
 	return logger
 }
 
+func NewNop() *Logger {
+	logger := &Logger{
+		zaplog: zap.NewNop(),
+		level:  zap.PanicLevel,
+	}
+	return logger
+}
+
 func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 	var cores []zapcore.Core
 	cfg := zap.NewProductionConfig()
