@@ -1,49 +1,50 @@
 package resp
 
-type Resp interface {
-	i()                                                                   // i 为了避免被其他包实现
-	WithData(data interface{}) Resp                                       // WithData 设置成功时返回的数据
-	WithPage(data interface{}, pageSize int, current int, total int) Resp // WithPageData 设置成功时返回的分页结构体
-	WithMessage(id string) Resp                                           // WithMessage 设置当前请求的错误信息
+type IResp interface {
+	i()                                                                    // i 为了避免被其他包实现
+	WithData(data interface{}) IResp                                       // WithData 设置成功时返回的数据
+	WithPage(data interface{}, pageSize int, current int, total int) IResp // WithPageData 设置成功时返回的分页结构体
+	WithMessage(id string) IResp                                           // WithMessage 设置当前请求的错误信息
 }
 
-type RespPage interface {
+type IRespPage interface {
 	GetData() interface{}
 	GetTotal() int64
 	GetPageSize() int
 	GetCurrent() int
 }
 
-type resp struct {
+type Resp struct {
 	Code    int         `json:"code"`              // 业务编码
 	Message string      `json:"message,omitempty"` // 错误描述
 	Data    interface{} `json:"data,omitempty"`    // 成功时返回的数据
-} //@name Resp
+} //@name IResp
 
-type respPage struct {
-	resp
+type RespPage struct {
+	Resp
 	Current  *int `json:"current,omitempty"`  // 分页::当前页 从 1 开始
 	PageSize *int `json:"pageSize,omitempty"` // 分页::每页大小
 	Total    *int `json:"total,omitempty"`    // 分页::总记录数
-} //@name RespPage
+} //@name IRespPage
 
-func NewResp(code int, msg string) Resp {
-	return &resp{
+func NewResp(code int, msg string) IResp {
+	return &Resp{
 		Code:    code,
 		Message: msg,
 		Data:    nil,
 	}
 }
 
-func (e *resp) i() {}
+func (e *Resp) i()     {}
+func (e *RespPage) i() {}
 
-func (e *resp) WithData(data interface{}) Resp {
+func (e *Resp) WithData(data interface{}) IResp {
 	e.Data = data
 	return e
 }
 
-func (e *resp) WithPage(data interface{}, pageSize int, current int, total int) Resp {
-	p := &respPage{}
+func (e *Resp) WithPage(data interface{}, pageSize int, current int, total int) IResp {
+	p := &RespPage{}
 	p.Code = e.Code
 	p.Message = e.Message
 	p.Data = data
@@ -53,7 +54,7 @@ func (e *resp) WithPage(data interface{}, pageSize int, current int, total int) 
 	return p
 }
 
-func (e *respPage) WithPage(data interface{}, pageSize int, current int, total int) Resp {
+func (e *RespPage) WithPage(data interface{}, pageSize int, current int, total int) IResp {
 	e.Data = data
 	e.PageSize = &pageSize
 	e.Current = &current
@@ -61,7 +62,7 @@ func (e *respPage) WithPage(data interface{}, pageSize int, current int, total i
 	return e
 }
 
-func (e *resp) WithMessage(msg string) Resp {
+func (e *Resp) WithMessage(msg string) IResp {
 	e.Message = msg
 	return e
 }
