@@ -112,6 +112,7 @@ var (
 	Fatal  = std.zaplog.Fatal
 	Debug  = std.zaplog.Debug
 	Sugar  = std.zaplog.Sugar
+	Debugf = std.zaplog.Sugar().Debugf
 	Infof  = std.zaplog.Sugar().Infof
 	Warnf  = std.zaplog.Sugar().Warnf
 	Errorf = std.zaplog.Sugar().Errorf
@@ -133,6 +134,7 @@ func ResetDefault(newStd *Logger) {
 	Fatal = std.zaplog.Fatal
 	Debug = std.zaplog.Debug
 	Sugar = std.zaplog.Sugar
+	Debugf = std.zaplog.Sugar().Debugf
 	Infof = std.zaplog.Sugar().Infof
 	Warnf = std.zaplog.Sugar().Warnf
 	Errorf = std.zaplog.Sugar().Errorf
