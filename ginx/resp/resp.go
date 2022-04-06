@@ -18,14 +18,14 @@ type Resp struct {
 	Code    int         `json:"code"`              // 业务编码
 	Message string      `json:"message,omitempty"` // 错误描述
 	Data    interface{} `json:"data,omitempty"`    // 成功时返回的数据
-} //@name IResp
+} //@name Resp
 
 type RespPage struct {
 	Resp
 	Current  *int `json:"current,omitempty"`  // 分页::当前页 从 1 开始
 	PageSize *int `json:"pageSize,omitempty"` // 分页::每页大小
 	Total    *int `json:"total,omitempty"`    // 分页::总记录数
-} //@name IRespPage
+} //@name RespPage
 
 func NewResp(code int, msg string) IResp {
 	return &Resp{

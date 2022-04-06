@@ -10,8 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sendya/pkg/env"
 	"go.uber.org/fx"
+
+	"github.com/sendya/pkg/env"
 )
 
 func init() {

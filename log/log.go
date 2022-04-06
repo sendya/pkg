@@ -24,6 +24,7 @@ type RotateOptions struct {
 	MaxAge     int
 	MaxBackups int
 	Compress   bool
+	LocalTime  bool
 }
 type TeeOption struct {
 	Filename string
@@ -204,6 +205,7 @@ func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 			MaxBackups: top.Ropt.MaxBackups,
 			MaxAge:     top.Ropt.MaxAge,
 			Compress:   top.Ropt.Compress,
+			LocalTime:  top.Ropt.LocalTime,
 		})
 
 		core := zapcore.NewCore(
