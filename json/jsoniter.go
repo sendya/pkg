@@ -54,3 +54,9 @@ func ToJSONs(v interface{}) string {
 func ToStruct(s string, v interface{}) error {
 	return std.Unmarshal([]byte(s), v)
 }
+
+var (
+	Unmarshal     = ToStruct
+	Marshal       = ToJSONb
+	MarshalString = ToJSON
+)

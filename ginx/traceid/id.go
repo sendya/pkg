@@ -55,7 +55,7 @@ func init() {
 	counter = &Counter{
 		c:     1000,
 		begin: 1000,
-		max:   9999,
+		max:   9000,
 	}
 }
 
