@@ -9,12 +9,6 @@ import (
 
 var std = jsoniter.ConfigCompatibleWithStandardLibrary
 
-var (
-	Unmarshal     = ToStruct
-	Marshal       = ToJSONb
-	MarshalString = ToJSON
-)
-
 // ToJSON transform struct to json
 func ToJSON(v interface{}) string {
 	b, err := std.Marshal(v)
