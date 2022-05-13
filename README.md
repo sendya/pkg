@@ -16,11 +16,15 @@
 
 > gin-gonic req/resp 的封装，middleware 封装
 
-### JSON
+- ginlog  # gin-logger with zap
+- resp    # resp.OK(ctx) / resp.JSON(ctx, interface{}) 
+- traceid # 请求跟踪链中间件
+
+### Json
 
 > json 使用了 std json 和 jsoniter ，编译时可以使用 -tags=jsoniter 来使用 jsoniter
 
-### LOG
+### Log
 
 > log 使用 zap log 进行二次封装，加装了 context 的能力
 
