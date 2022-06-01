@@ -41,7 +41,7 @@ e.g. 0ad1348f1403169275002100356696
 */
 func New() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		traceID := newID()
+		traceID := NewID()
 		ctx, _ := log.WithFields(c.Request.Context(), zap.String("traceId", traceID))
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()
@@ -59,7 +59,7 @@ func init() {
 	}
 }
 
-func newID() string {
+func NewID() string {
 	var id strings.Builder
 
 	ts := time.Now().UnixMilli()

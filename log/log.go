@@ -15,9 +15,13 @@ const SecurityMark = "[Security Mark]"
 // function variables for all field types
 // in github.com/uber-go/zap/field.go
 
+type Core = zapcore.Core
 type Level = zapcore.Level
 type Field = zap.Field
 type Option = zap.Option
+type Config = zap.Config
+type EncoderConfig = zapcore.EncoderConfig
+type EncodeType = int
 type LevelEnablerFunc func(lvl Level) bool
 type RotateOptions struct {
 	MaxSize    int
@@ -44,6 +48,10 @@ const (
 	PanicLevel  Level = zap.PanicLevel  // 4, PanicLevel logs a message, then panics
 	FatalLevel  Level = zap.FatalLevel  // 5, FatalLevel logs a message, then calls os.Exit(1).
 	DebugLevel  Level = zap.DebugLevel  // -1
+)
+const (
+	ConsoleEncoder EncodeType = iota // 0, default 控制台编码器
+	JSONEncoder
 )
 
 var (
@@ -103,6 +111,17 @@ var (
 	AddCallerSkip = zap.AddCallerSkip
 	AddStacktrace = zap.AddStacktrace
 
+	// core
+	NewCore           = zapcore.NewCore
+	NewNopCore        = zapcore.NewNopCore
+	AddSync           = zapcore.AddSync
+	NewJSONEncoder    = zapcore.NewJSONEncoder
+	NewConsoleEncoder = zapcore.NewConsoleEncoder
+
+	// encoder config
+	NewDevelopmentEncoderConfig = zap.NewDevelopmentEncoderConfig
+	NewProductionEncoderConfig  = zap.NewProductionEncoderConfig
+
 	Named  = std.zaplog.Named
 	Info   = std.zaplog.Info
 	Warn   = std.zaplog.Warn
@@ -151,21 +170,20 @@ func SetLevel(level string) {
 
 // New create a new logger (not support log rotating).
 func New(writer io.Writer, level Level, opts ...Option) *Logger {
-	if writer == nil {
-		panic("the writer is nil")
-	}
-	cfg := zap.NewDevelopmentConfig()
-	cfg.EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	checkWriter(writer)
+
+	encoder := zap.NewDevelopmentEncoderConfig()
+	encoder.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Format("15:04:05.000"))
 	}
-	cfg.EncoderConfig.EncodeLevel = func(l zapcore.Level, pae zapcore.PrimitiveArrayEncoder) {
+	encoder.EncodeLevel = func(l zapcore.Level, pae zapcore.PrimitiveArrayEncoder) {
 		zapcore.CapitalColorLevelEncoder(l, pae)
 	}
-	cfg.EncoderConfig.EncodeCaller = func(c zapcore.EntryCaller, pae zapcore.PrimitiveArrayEncoder) {
+	encoder.EncodeCaller = func(c zapcore.EntryCaller, pae zapcore.PrimitiveArrayEncoder) {
 		pae.AppendString(c.TrimmedPath())
 	}
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(cfg.EncoderConfig),
+		zapcore.NewConsoleEncoder(encoder),
 		zapcore.AddSync(writer),
 		zapcore.Level(level),
 	)
@@ -176,14 +194,36 @@ func New(writer io.Writer, level Level, opts ...Option) *Logger {
 	return logger
 }
 
-func NewNop() *Logger {
+// NewWithEncoder New Logger with custom EncoderConfig
+func NewWithEncoder(writer io.Writer, level Level, encoder EncoderConfig, opts ...Option) *Logger {
+	checkWriter(writer)
+
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoder),
+		zapcore.AddSync(writer),
+		zapcore.Level(level),
+	)
+
 	logger := &Logger{
-		zaplog: zap.NewNop(),
-		level:  zap.PanicLevel,
+		zaplog: zap.New(core, opts...),
+		level:  level,
 	}
 	return logger
 }
 
+// NewCustom New Logger with any config
+func NewCustom(core Core, opts ...Option) *Logger {
+	z := zap.New(core, opts...)
+
+	logger := &Logger{
+		zaplog: z,
+		level:  DPanicLevel,
+	}
+
+	return logger
+}
+
+// NewTeeWithRotate New Prod Logger and rotate logger files
 func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 	var cores []zapcore.Core
 	cfg := zap.NewProductionConfig()
@@ -224,6 +264,15 @@ func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 	return logger
 }
 
+// NewNop New nil output Logger
+func NewNop() *Logger {
+	logger := &Logger{
+		zaplog: zap.NewNop(),
+		level:  zap.PanicLevel,
+	}
+	return logger
+}
+
 func (l *Logger) Sync() error {
 	return l.zaplog.Sync()
 }
@@ -233,4 +282,10 @@ func Sync() error {
 		return std.Sync()
 	}
 	return nil
+}
+
+func checkWriter(writer io.Writer) {
+	if writer == nil {
+		panic("the writer is nil, if you need nop log, you can try NewNop()")
+	}
 }
