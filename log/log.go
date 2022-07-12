@@ -55,7 +55,7 @@ const (
 )
 
 var (
-	std = New(os.Stderr, DebugLevel, WithCaller(true), AddCallerSkip(0))
+	std = New(os.Stdout, DebugLevel, WithCaller(true), AddCallerSkip(0))
 	// defined
 	Skip        = zap.Skip
 	Binary      = zap.Binary
