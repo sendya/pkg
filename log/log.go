@@ -249,10 +249,10 @@ func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 		})
 		// temp..
 		if top.Filename == "stdout" {
-			w = os.Stdout
+			w = zapcore.AddSync(os.Stdout)
 		}
 		if top.Filename == "stderr" {
-			w = os.Stderr
+			w = zapcore.AddSync(os.Stderr)
 		}
 
 		core := zapcore.NewCore(
