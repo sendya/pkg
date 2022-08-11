@@ -235,8 +235,6 @@ func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 	}
 
 	for _, top := range tops {
-		top := top
-
 		lv := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 			return top.Lef(Level(lvl))
 		})
@@ -249,6 +247,13 @@ func NewTeeWithRotate(tops []TeeOption, opts ...Option) *Logger {
 			Compress:   top.Ropt.Compress,
 			LocalTime:  top.Ropt.LocalTime,
 		})
+		// temp..
+		if top.Filename == "stdout" {
+			w = os.Stdout
+		}
+		if top.Filename == "stderr" {
+			w = os.Stderr
+		}
 
 		core := zapcore.NewCore(
 			zapcore.NewJSONEncoder(cfg.EncoderConfig),
